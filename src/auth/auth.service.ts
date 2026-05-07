@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
 import { UserSeedService } from '../me/user-seed.service';
+import type { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,19 +29,22 @@ export class AuthService {
     });
   }
 
-  async register(login: string, password: string) {
-    const existing = await this.usersRepo.findOne({ where: { login } });
+  async register(dto: RegisterDto) {
+    const existing = await this.usersRepo.findOne({ where: { login: dto.login } });
     if (existing) throw new ConflictException('login_taken');
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    const passwordHash = await bcrypt.hash(dto.password, 12);
     const saved = await this.usersRepo.save(
       this.usersRepo.create({
-        login,
+        login: dto.login,
         passwordHash,
+        role: dto.role ?? 'employee',
+        fullName: dto.fullName ?? '',
+        team: dto.team ?? '',
       }),
     );
 
-    await this.userSeed.seedDemoIfNeeded(saved.id);
+    if (saved.role === 'employee') await this.userSeed.seedDemoIfNeeded(saved.id);
     const user = await this.usersRepo.findOne({ where: { id: saved.id } });
     if (!user) throw new InternalServerErrorException('persist_failed');
 

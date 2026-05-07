@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
@@ -19,7 +19,10 @@ export class UserSeedService {
   /** Inserts starter tasks + ledger rows for UX parity with the mocked client demo. */
   async seedDemoIfNeeded(userId: string) {
     const existing = await this.tasksRepo.exist({ where: { userId } });
-    if (existing) return;
+    if (existing) {
+      await this.seedProfileDefaults(userId);
+      return;
+    }
 
     const now = Date.now();
     const day = (n: number) => new Date(now + n * 24 * 60 * 60 * 1000);
@@ -29,7 +32,7 @@ export class UserSeedService {
     const tasks = await this.tasksRepo.save([
       this.tasksRepo.create({
         userId,
-        title: 'Кэширование в API клиенте',
+        title: 'РљСЌС€РёСЂРѕРІР°РЅРёРµ РІ API РєР»РёРµРЅС‚Рµ',
         project: 'CORE-API',
         baseXp: 100,
         dueAt: day(1),
@@ -37,15 +40,15 @@ export class UserSeedService {
         finalXp: null,
         completedAt: null,
         description:
-          'Сделать кэширование GET-запросов в API клиенте и убедиться, что инвалидируется по ключу.',
+          'РЎРґРµР»Р°С‚СЊ РєСЌС€РёСЂРѕРІР°РЅРёРµ GET-Р·Р°РїСЂРѕСЃРѕРІ РІ API РєР»РёРµРЅС‚Рµ Рё СѓР±РµРґРёС‚СЊСЃСЏ, С‡С‚Рѕ РёРЅРІР°Р»РёРґРёСЂСѓРµС‚СЃСЏ РїРѕ РєР»СЋС‡Сѓ.',
         tags: ['backend', 'performance'],
         review: 'pending',
         xpBreakdown: {
           xpBase: 100,
           kDeadline: null,
-          kDeadlineLabel: 'ещё в работе',
+          kDeadlineLabel: 'РµС‰С‘ РІ СЂР°Р±РѕС‚Рµ',
           kReview: null,
-          kReviewLabel: 'ждёт оценки',
+          kReviewLabel: 'Р¶РґС‘С‚ РѕС†РµРЅРєРё',
           bonusPrIterations: 0,
           bonusReviewer: 0,
           xpFinal: null,
@@ -55,23 +58,23 @@ export class UserSeedService {
             id: auditId(),
             type: 'created',
             at: day(-3).toISOString(),
-            actorName: 'Менеджер',
-            title: 'Задача создана',
-            subtitle: 'Назначена тебе',
+            actorName: 'РњРµРЅРµРґР¶РµСЂ',
+            title: 'Р—Р°РґР°С‡Р° СЃРѕР·РґР°РЅР°',
+            subtitle: 'РќР°Р·РЅР°С‡РµРЅР° С‚РµР±Рµ',
           },
           {
             id: auditId(),
             type: 'deadline_changed',
             at: day(-1).toISOString(),
-            actorName: 'Менеджер',
-            title: 'Изменён дедлайн',
-            subtitle: `Было: ${day(2).toLocaleDateString('ru-RU')} → Стало: ${day(1).toLocaleDateString('ru-RU')}`,
+            actorName: 'РњРµРЅРµРґР¶РµСЂ',
+            title: 'РР·РјРµРЅС‘РЅ РґРµРґР»Р°Р№РЅ',
+            subtitle: `Р‘С‹Р»Рѕ: ${day(2).toLocaleDateString('ru-RU')} в†’ РЎС‚Р°Р»Рѕ: ${day(1).toLocaleDateString('ru-RU')}`,
           },
         ],
       }),
       this.tasksRepo.create({
         userId,
-        title: 'Дубли при импорте CSV',
+        title: 'Р”СѓР±Р»Рё РїСЂРё РёРјРїРѕСЂС‚Рµ CSV',
         project: 'IMPORT',
         baseXp: 60,
         dueAt: day(-2),
@@ -79,15 +82,15 @@ export class UserSeedService {
         finalXp: null,
         completedAt: day(-1),
         description:
-          'Устранить дубли при импорте CSV, добавить тест и миграцию уникального индекса при необходимости.',
+          'РЈСЃС‚СЂР°РЅРёС‚СЊ РґСѓР±Р»Рё РїСЂРё РёРјРїРѕСЂС‚Рµ CSV, РґРѕР±Р°РІРёС‚СЊ С‚РµСЃС‚ Рё РјРёРіСЂР°С†РёСЋ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ РёРЅРґРµРєСЃР° РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё.',
         tags: ['data', 'import'],
         review: 'pending',
         xpBreakdown: {
           xpBase: 60,
           kDeadline: 0.9,
-          kDeadlineLabel: 'с просрочкой',
+          kDeadlineLabel: 'СЃ РїСЂРѕСЃСЂРѕС‡РєРѕР№',
           kReview: null,
-          kReviewLabel: 'ждёт оценки',
+          kReviewLabel: 'Р¶РґС‘С‚ РѕС†РµРЅРєРё',
           bonusPrIterations: 10,
           bonusReviewer: 0,
           xpFinal: null,
@@ -97,30 +100,30 @@ export class UserSeedService {
             id: auditId(),
             type: 'created',
             at: day(-12).toISOString(),
-            actorName: 'Менеджер',
-            title: 'Задача создана',
+            actorName: 'РњРµРЅРµРґР¶РµСЂ',
+            title: 'Р—Р°РґР°С‡Р° СЃРѕР·РґР°РЅР°',
           },
           {
             id: auditId(),
             type: 'closed',
             at: day(-1).toISOString(),
-            actorName: 'Ты',
-            title: 'Задача закрыта',
-            subtitle: 'Ожидает оценки ревью',
+            actorName: 'РўС‹',
+            title: 'Р—Р°РґР°С‡Р° Р·Р°РєСЂС‹С‚Р°',
+            subtitle: 'РћР¶РёРґР°РµС‚ РѕС†РµРЅРєРё СЂРµРІСЊСЋ',
           },
           {
             id: auditId(),
             type: 'pr_iterations_set',
             at: day(-1).toISOString(),
-            actorName: 'Ревьюер',
-            title: 'Итерации правок',
-            subtitle: '1 правка (+10 XP)',
+            actorName: 'Р РµРІСЊСЋРµСЂ',
+            title: 'РС‚РµСЂР°С†РёРё РїСЂР°РІРѕРє',
+            subtitle: '1 РїСЂР°РІРєР° (+10 XP)',
           },
         ],
       }),
       this.tasksRepo.create({
         userId,
-        title: 'Тесты модуля scoring',
+        title: 'РўРµСЃС‚С‹ РјРѕРґСѓР»СЏ scoring',
         project: 'SCORING',
         baseXp: 80,
         dueAt: day(5),
@@ -135,7 +138,7 @@ export class UserSeedService {
       }),
       this.tasksRepo.create({
         userId,
-        title: 'Рефакторинг расчёта множителей XP',
+        title: 'Р РµС„Р°РєС‚РѕСЂРёРЅРі СЂР°СЃС‡С‘С‚Р° РјРЅРѕР¶РёС‚РµР»РµР№ XP',
         project: 'GRADE',
         baseXp: 120,
         dueAt: day(-10),
@@ -143,13 +146,13 @@ export class UserSeedService {
         finalXp: 156,
         completedAt: day(-9),
         description:
-          'Привести расчёт множителей XP к единой формуле, добавить отображение breakdown в карточке задачи.',
+          'РџСЂРёРІРµСЃС‚Рё СЂР°СЃС‡С‘С‚ РјРЅРѕР¶РёС‚РµР»РµР№ XP Рє РµРґРёРЅРѕР№ С„РѕСЂРјСѓР»Рµ, РґРѕР±Р°РІРёС‚СЊ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ breakdown РІ РєР°СЂС‚РѕС‡РєРµ Р·Р°РґР°С‡Рё.',
         tags: ['core', 'grade'],
         review: 'approved',
         xpBreakdown: {
           xpBase: 120,
           kDeadline: 1.0,
-          kDeadlineLabel: 'вовремя',
+          kDeadlineLabel: 'РІРѕРІСЂРµРјСЏ',
           kReview: 1.2,
           kReviewLabel: 'Approved',
           bonusPrIterations: 0,
@@ -161,37 +164,37 @@ export class UserSeedService {
             id: auditId(),
             type: 'created',
             at: day(-20).toISOString(),
-            actorName: 'Менеджер',
-            title: 'Задача создана',
+            actorName: 'РњРµРЅРµРґР¶РµСЂ',
+            title: 'Р—Р°РґР°С‡Р° СЃРѕР·РґР°РЅР°',
           },
           {
             id: auditId(),
             type: 'closed',
             at: day(-9).toISOString(),
-            actorName: 'Ты',
-            title: 'Задача закрыта',
+            actorName: 'РўС‹',
+            title: 'Р—Р°РґР°С‡Р° Р·Р°РєСЂС‹С‚Р°',
           },
           {
             id: auditId(),
             type: 'review_assessed',
             at: day(-9).toISOString(),
-            actorName: 'Ревьюер',
-            title: 'Оценка ревью',
-            subtitle: 'Approved (×1.2)',
+            actorName: 'Р РµРІСЊСЋРµСЂ',
+            title: 'РћС†РµРЅРєР° СЂРµРІСЊСЋ',
+            subtitle: 'Approved (Г—1.2)',
           },
           {
             id: auditId(),
             type: 'manual_adjustment',
             at: day(-8).toISOString(),
-            actorName: 'Менеджер',
-            title: 'Ручная корректировка',
-            subtitle: '+0 XP · “без изменений”',
+            actorName: 'РњРµРЅРµРґР¶РµСЂ',
+            title: 'Р СѓС‡РЅР°СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР°',
+            subtitle: '+0 XP В· вЂњР±РµР· РёР·РјРµРЅРµРЅРёР№вЂќ',
           },
         ],
       }),
       this.tasksRepo.create({
         userId,
-        title: 'Обновить документацию по онбордингу',
+        title: 'РћР±РЅРѕРІРёС‚СЊ РґРѕРєСѓРјРµРЅС‚Р°С†РёСЋ РїРѕ РѕРЅР±РѕСЂРґРёРЅРіСѓ',
         project: 'DOCS',
         baseXp: 40,
         dueAt: null,
@@ -216,7 +219,7 @@ export class UserSeedService {
         type: 'task_award',
         actorId: 'system',
         taskId: tImport.id,
-        comment: 'Approved ×1.0',
+        comment: 'Approved Г—1.0',
         meta: { kReview: 1.0 },
       }),
       this.xpRepo.create({
@@ -226,7 +229,7 @@ export class UserSeedService {
         type: 'manual_adjustment',
         actorId: 'manager:ivan',
         taskId: null,
-        comment: 'Корректировка за перенос дедлайна',
+        comment: 'РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° Р·Р° РїРµСЂРµРЅРѕСЃ РґРµРґР»Р°Р№РЅР°',
         meta: null,
       }),
       this.xpRepo.create({
@@ -236,7 +239,7 @@ export class UserSeedService {
         type: 'task_award',
         actorId: 'system',
         taskId: tasks[0].id,
-        comment: 'Approved ×1.2',
+        comment: 'Approved Г—1.2',
         meta: { kReview: 1.2 },
       }),
       this.xpRepo.create({
@@ -246,7 +249,7 @@ export class UserSeedService {
         type: 'grade_up',
         actorId: 'system',
         taskId: null,
-        comment: 'Повышение грейда: Junior → Middle',
+        comment: 'РџРѕРІС‹С€РµРЅРёРµ РіСЂРµР№РґР°: Junior в†’ Middle',
         meta: null,
       }),
     ]);
@@ -272,7 +275,8 @@ export class UserSeedService {
     const user = await this.usersRepo.findOne({ where: { id: userId } });
     if (!user) return;
     if (!user.fullName?.trim()) {
-      await this.usersRepo.update({ id: userId }, { fullName: 'Иван Петров' });
+      await this.usersRepo.update({ id: userId }, { fullName: 'РРІР°РЅ РџРµС‚СЂРѕРІ' });
     }
   }
 }
+

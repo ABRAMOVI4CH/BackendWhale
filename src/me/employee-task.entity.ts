@@ -21,6 +21,13 @@ export class EmployeeTaskEntity {
   @Column({ type: 'text' })
   userId!: string;
 
+  @Index(['managerTaskId'])
+  @Column({ type: 'text', nullable: true })
+  managerTaskId!: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  managerId!: string | null;
+
   @Column({ type: 'text' })
   title!: string;
 
